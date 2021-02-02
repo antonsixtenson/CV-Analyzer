@@ -3,10 +3,7 @@ package sample;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -14,6 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -37,7 +35,7 @@ public class Controller {
     protected String [] hk_arr;
     protected String [] sk_arr;
     protected List<File> files_list;
-    protected List<Cv> cv_list;
+    protected ArrayList<Cv> cv_list = new ArrayList<>();
 
     public void openFc(){
         FileChooser fc = new FileChooser();
@@ -49,7 +47,8 @@ public class Controller {
     }
 
     public void setContent(){
-        String text = showSelectedFile();
+        String filepath = selectedFilepath();
+        String text = showSelectedFile(filepath);
         Text txt = new Text(text);
         content_pane.setContent(txt);
         flyAnalyze();
@@ -76,18 +75,19 @@ public class Controller {
     }
 
     public void flyAnalyze() {
-        double [] percValues = percentAnalyze();
-        int [] values = analyze();
+        String filepath = selectedFilepath();
+        double [] percValues = percentAnalyze(filepath);
+        int [] values = analyze(filepath);
         hk_matches_label.setText(String.format("%.1f", percValues[0]) + "%");
         sk_matches_label.setText(String.format("%.1f", percValues[1]) + "%");
         double d = distance(values[0], values[1]);
         d_match_label.setText(String.format("%.2f", d) + " lu");
     }
 
-    public int [] analyze(){
+    public int [] analyze(String filepath){
         hk_arr = hk_keys.getText().replace("\n", "").toLowerCase(Locale.ROOT).split(",");
         sk_arr = sk_keys.getText().replace("\n", "").toLowerCase(Locale.ROOT).split(",");
-        String text = showSelectedFile().toLowerCase(Locale.ROOT);
+        String text = showSelectedFile(filepath).toLowerCase(Locale.ROOT);
         int hk_matches = 0;
         int sk_matches = 0;
         for(int i = 0; i < hk_arr.length; i++){
@@ -104,10 +104,10 @@ public class Controller {
         return values;
     }
 
-    public double [] percentAnalyze(){
+    public double [] percentAnalyze(String filepath){
         hk_arr = hk_keys.getText().replace("\n", "").toLowerCase(Locale.ROOT).split(",");
         sk_arr = sk_keys.getText().replace("\n", "").toLowerCase(Locale.ROOT).split(",");
-        String text = showSelectedFile().toLowerCase(Locale.ROOT);
+        String text = showSelectedFile(filepath).toLowerCase(Locale.ROOT);
         int hk_matches = 0;
         int sk_matches = 0;
         for(int i = 0; i < hk_arr.length; i++){
@@ -124,10 +124,9 @@ public class Controller {
         return values;
     }
 
-    public String showSelectedFile() {
-        String file = selectedFilepath();
+    public String showSelectedFile(String filepath) {
         try {
-            String text = readPdf.readPdf(file);
+            String text = readPdf.readPdf(filepath);
             return text;
         } catch (IOException e) {
             System.out.println("ERROR: " + e);
@@ -145,7 +144,8 @@ public class Controller {
     }
 
     public void analyzeOne(){
-        Cv cv = createCvObject();
+        String filepath = selectedFilepath();
+        Cv cv = createCvObject(filepath);
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Keys");
         NumberAxis yAxis = new NumberAxis(0, 100, 10);
@@ -164,15 +164,41 @@ public class Controller {
 
 
 
+    public void createScatterShart() {
+        NumberAxis xAxis = new NumberAxis(0, 100, 10);
+        NumberAxis yAxis = new NumberAxis(0, 100, 10);
+        ScatterChart sc = new ScatterChart(xAxis, yAxis);
+        xAxis.setLabel("Hard Keys");
+        yAxis.setLabel("Soft Keys");
+        sc.setTitle("Candidates Matches");
+        for(int i = 0; i < cv_list.size(); i++){
+            XYChart.Series cand = new XYChart.Series();
+            Cv temp = cv_list.get(i);
+            cand.setName(temp.getName());
+            cand.getData().add(new XYChart.Data<>(temp.getHkMatches(), temp.getSkMatches()));
+            sc.getData().add(cand);
+        }
+        content_pane.setContent(sc);
 
-    public void analyzeAll() {
-        System.out.println("PlaceHolder");
+
     }
 
-    public Cv createCvObject(){
-        String filepath = selectedFilepath();
-        double [] percValues = percentAnalyze();
-        int [] values = analyze();
+    public void createCvObjectAll(){
+        for(int i = 0; i < files_list.size(); i++){
+            String filepath = files_list.get(i).getPath();
+            Cv temp = createCvObject(filepath);
+            cv_list.add(temp);
+        }
+    }
+
+    public void analyzeAll(){
+        createCvObjectAll();
+        createScatterShart();
+    }
+
+    public Cv createCvObject(String filepath){
+        double [] percValues = percentAnalyze(filepath);
+        int [] values = analyze(filepath);
         String [] name = filepath.split("/");
         double d_key = distance(values[0], values[1]);
         Cv newCv = new Cv(filepath, name[name.length-1], percValues[0], percValues[1], d_key);
