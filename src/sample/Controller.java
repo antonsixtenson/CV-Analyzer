@@ -152,11 +152,11 @@ public class Controller {
         CategoryAxis xAxis = new CategoryAxis();
         xAxis.setLabel("Keys");
         NumberAxis yAxis = new NumberAxis(0, 100, 10);
-        yAxis.setLabel("Matches");
+        yAxis.setLabel("Matches (%)");
         BarChart bc = new BarChart(xAxis, yAxis);
         bc.setTitle(cv.getName());
         XYChart.Series series = new XYChart.Series();
-        series.setName("Matches");
+        series.setName("Matches (in percent)");
         series.getData().add(new XYChart.Data<>("Hard Keys", cv.getHkMatches()));
         series.getData().add(new XYChart.Data<>("Soft Keys", cv.getSkMatches()));
         bc.getData().add(series);
