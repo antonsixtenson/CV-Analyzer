@@ -34,15 +34,18 @@ public class Controller {
     protected int sk_value = 10;
     protected String [] hk_arr;
     protected String [] sk_arr;
-    protected List<File> files_list;
+    protected List<File> files_temp;
+    protected ArrayList<String> file_list = new ArrayList<>();
     protected ArrayList<Cv> cv_list = new ArrayList<>();
 
     public void openFc(){
         FileChooser fc = new FileChooser();
         fc.setTitle("IMPORT DOCUMENTS");
-        files_list = fc.showOpenMultipleDialog(new Stage());
-        for(int i = 0; i < files_list.size(); i++){
-            cvs_lst.getItems().add(files_list.get(i).getPath());
+        files_temp = fc.showOpenMultipleDialog(new Stage());
+        for(int i = 0; i < files_temp.size(); i++){
+            String path = files_temp.get(i).getPath();
+            cvs_lst.getItems().add(path);
+            file_list.add(path);
         }
     }
 
@@ -155,8 +158,6 @@ public class Controller {
         XYChart.Series series = new XYChart.Series();
         series.setName("Matches");
         series.getData().add(new XYChart.Data<>("Hard Keys", cv.getHkMatches()));
-        System.out.println(cv.getHkMatches());
-        System.out.println((int)cv.getHkMatches());
         series.getData().add(new XYChart.Data<>("Soft Keys", cv.getSkMatches()));
         bc.getData().add(series);
         content_pane.setContent(bc);
@@ -179,13 +180,11 @@ public class Controller {
             sc.getData().add(cand);
         }
         content_pane.setContent(sc);
-
-
     }
 
     public void createCvObjectAll(){
-        for(int i = 0; i < files_list.size(); i++){
-            String filepath = files_list.get(i).getPath();
+        for(int i = 0; i < file_list.size(); i++){
+            String filepath = file_list.get(i);
             Cv temp = createCvObject(filepath);
             cv_list.add(temp);
         }
