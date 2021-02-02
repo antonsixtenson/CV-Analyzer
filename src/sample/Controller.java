@@ -37,6 +37,7 @@ public class Controller {
     protected List<File> files_temp;
     protected ArrayList<String> file_list = new ArrayList<>();
     protected ArrayList<Cv> cv_list = new ArrayList<>();
+    protected ScatterChart sc_show;
 
     public void openFc(){
         FileChooser fc = new FileChooser();
@@ -165,9 +166,9 @@ public class Controller {
 
 
 
-    public void createScatterShart() {
-        NumberAxis xAxis = new NumberAxis(0, 100, 10);
-        NumberAxis yAxis = new NumberAxis(0, 100, 10);
+    public ScatterChart createScatterShart() {
+        NumberAxis xAxis = new NumberAxis(0, 110, 10);
+        NumberAxis yAxis = new NumberAxis(0, 110, 10);
         ScatterChart sc = new ScatterChart(xAxis, yAxis);
         xAxis.setLabel("Hard Keys");
         yAxis.setLabel("Soft Keys");
@@ -179,6 +180,10 @@ public class Controller {
             cand.getData().add(new XYChart.Data<>(temp.getHkMatches(), temp.getSkMatches()));
             sc.getData().add(cand);
         }
+        return sc;
+    }
+
+    public void showScatterShart(ScatterChart sc){
         content_pane.setContent(sc);
     }
 
@@ -192,7 +197,10 @@ public class Controller {
 
     public void analyzeAll(){
         createCvObjectAll();
-        createScatterShart();
+        if(sc_show == null){
+            sc_show = createScatterShart();
+        }
+        showScatterShart(sc_show);
     }
 
     public Cv createCvObject(String filepath){
