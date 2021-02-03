@@ -12,7 +12,7 @@ Data can then be represented graphically.
 <img src="/Images/img_03.png" width="500" height="400">
 
 <b>Analyze All (imported PDFs)</b><br>
-<img src="/Images/img_04.png" width="500" height="400">
+<img src="/Images/img_04_2.png" width="500" height="400">
 
 
 ## TODO:
