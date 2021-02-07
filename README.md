@@ -3,7 +3,6 @@
 Reads PDF documents and matches content against keywords.
 Data can then be represented graphically.
 
-### Works for Linux OSes.
 
 <b>Preview Read from selected PDF</b><br>
 <img src="/Images/img_02.png" width="450" height="350">
@@ -14,6 +13,3 @@ Data can then be represented graphically.
 <b>Analyze All (imported PDFs)</b><br>
 <img src="/Images/img_04_2.png" width="450" height="350">
 
-
-## TODO:
-Windows Support
